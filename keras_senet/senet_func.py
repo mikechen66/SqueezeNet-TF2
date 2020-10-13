@@ -47,8 +47,8 @@ import numpy as np
 import warnings
 
 from keras import layers
-from keras.layers import Add, Input, Conv2D, Dense, Activation, Flatten, Lambda, Multiply, MaxPooling2D, \
-    BatchNormalization, ZeroPadding2D, AveragePooling2D, GlobalAveragePooling2D
+from keras.layers import Add, Input, Conv2D, Dropout, Dense, Activation, Flatten, Lambda, Multiply, Concatenate, \
+    BatchNormalization, ZeroPadding2D, MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D
 from keras.models import Model
 import keras.backend as K
 from keras.preprocessing import image
