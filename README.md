@@ -1,24 +1,12 @@
 # SqueezeNet-TF2
 
+## Introduction 
+
 SqueezeNet is the name of a deep neural network for computer vision that was released in 2016. 
 SqueezeNet was developed by researchers at DeepScale, University of California, Berkeley, and 
 Stanford University. In designing SqueezeNet, the authors' goal was to create a smaller neural 
 network with fewer parameters that can more easily fit into computer memory and can more easily 
 be transmitted over a computer network.
-
-## Set up the GPU memory size to avoid the out-of-memory error if the GPU setting has a problem 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-  ### Restrict TensorFlow to only allocate 4GB of memory on the first GPU
-  try:
-    tf.config.experimental.set_virtual_device_configuration(
-        gpus[0],
-        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4096)])
-    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-  except RuntimeError as e:
-    # Virtual devices must be set before GPUs have been initialized
-    print(e)
 
 ## Modifications 
 
