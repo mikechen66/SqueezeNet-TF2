@@ -476,7 +476,7 @@ MODELS_PARAMS = {
     ),
 
     'SEResNeXt50': ModelParams(
-        'SEResneXt50', repetitions=(3, 4, 6, 3), residual_block=SEResNeXtBottleneck,
+        'SEResNeXt50', repetitions=(3, 4, 6, 3), residual_block=SEResNeXtBottleneck,
         groups=32, reduction=16, init_filters=64, input_3x3=False, dropout=None,
     ),
 
