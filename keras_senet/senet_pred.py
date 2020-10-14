@@ -1,22 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# senet_func.py
+# senet_pred.py
 
 """
+It is the general SqueezeNet realizations that cover the major variants. Grouped Convolution Layer 
+is implemented as a Slice, Conv2D and Concatenate Split filters to groups. 
+
 Please remember that it is the TensorFlow realization with image_data_foramt = 'channels_last'. If
-the env of Keras is 'channels_first', please change it  according to the TensorFlow convention.  
-Grouped Convolution Layer is implemented as a Slice, Conv2D and Concatenate Split filters to groups. 
-
-If users want to get the notop weights, please use the following section of code. 
-
-# Call the specific model with designating "include_top=False" 
-if __name__ == '__main__':
-    input_shape = (224,224,3)
-    num_classes = 1000
-    model= SEResNet50(input_shape=None, input_tensor=None, weights='imagenet', 
-                      num_classes=num_classes, include_top=False)
-    model.summary()
+the env of Keras is 'channels_first', please change it according to the TensorFlow convention.  
 
 # Set up the GPU memory size to avoid the out-of-memory error if the GPU setting has a problem 
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -50,6 +42,7 @@ SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model si
 https://arxiv.org/abs/1602.07360
 """
 
+
 import os
 import collections
 import tensorflow as tf
@@ -68,6 +61,7 @@ from keras.utils.data_utils import get_file
 from keras.applications.imagenet_utils import decode_predictions
 from imagenet_utils import _obtain_input_shape
 from keras.engine.topology import get_source_inputs
+from weights import load_model_weights
 
 
 # Set up the GPU to avoid the runtime error: Could not create cuDNN handle...
@@ -82,6 +76,7 @@ ModelParams = collections.namedtuple(
     ['model_name', 'repetitions', 'residual_block', 'groups',
      'reduction', 'init_filters', 'input_3x3', 'dropout']
 )
+
 
 # ----------------------------------------------------------------------------------------------------------
 # Give the helper functions
@@ -196,6 +191,7 @@ def ChannelSE(reduction=16, **kwargs):
         return x
 
     return layer
+
 
 # ----------------------------------------------------------------------------------------------------------
 # Residual blocks: SEResNetBottleneck and SEResNeXtBottleneck
@@ -453,163 +449,8 @@ def SENet(model_params, input_tensor=None, input_shape=None, include_top=True,
     return model
 
 
-def _find_weights(model_name, dataset, include_top):
-    w = list(filter(lambda x: x['model'] == model_name, WEIGHTS_COLLECTION))
-    w = list(filter(lambda x: x['dataset'] == dataset, w))
-    w = list(filter(lambda x: x['include_top'] == include_top, w))
-
-    return w
-
-
-def load_model_weights(model, model_name, dataset, num_classes, include_top, **kwargs):
-
-    weights = _find_weights(model_name, dataset, include_top)
-
-    if weights:
-        weights = weights[0]
-
-        if include_top and weights['num_classes'] != num_classes:
-            raise ValueError('If using `weights` and `include_top`'
-                             ' as true, `num_classes` should be {}'.format(weights['num_classes']))
-
-        weights_path = get_file(weights['name'], weights['url'], 
-                                cache_subdir='models', md5_hash=weights['md5'])
-
-        model.load_weights(weights_path)
-
-    else:
-        raise ValueError('There is no weights for such configuration: ' +
-                         'model = {}, dataset = {}, '.format(model.name, dataset) +
-                         'num_classes = {}, include_top = {}.'.format(num_classes, include_top))
-
-
-# Give the weights for the SE models
-WEIGHTS_COLLECTION = [
-
-    {
-        'model': 'seresnet50',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': True,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/seresnet50_imagenet_1000.h5',
-        'name': 'seresnet50_imagenet_1000.h5',
-        'md5': 'ff0ce1ed5accaad05d113ecef2d29149',
-    },
-
-    {
-        'model': 'seresnet50',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': False,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/seresnet50_imagenet_1000_no_top.h5',
-        'name': 'seresnet50_imagenet_1000_no_top.h5',
-        'md5': '043777781b0d5ca756474d60bf115ef1',
-    },
-
-    {
-        'model': 'seresnet101',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': True,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/seresnet101_imagenet_1000.h5',
-        'name': 'seresnet101_imagenet_1000.h5',
-        'md5': '5c31adee48c82a66a32dee3d442f5be8',
-    },
-
-    {
-        'model': 'seresnet101',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': False,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/seresnet101_imagenet_1000_no_top.h5',
-        'name': 'seresnet101_imagenet_1000_no_top.h5',
-        'md5': '1c373b0c196918713da86951d1239007',
-    },
-
-    {
-        'model': 'seresnet152',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': True,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/seresnet152_imagenet_1000.h5',
-        'name': 'seresnet152_imagenet_1000.h5',
-        'md5': '96fc14e3a939d4627b0174a0e80c7371',
-    },
-
-    {
-        'model': 'seresnet152',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': False,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/seresnet152_imagenet_1000_no_top.h5',
-        'name': 'seresnet152_imagenet_1000_no_top.h5',
-        'md5': 'f58d4c1a511c7445ab9a2c2b83ee4e7b',
-    },
-
-    {
-        'model': 'seresnext50',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': True,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/seresnext50_imagenet_1000.h5',
-        'name': 'seresnext50_imagenet_1000.h5',
-        'md5': '5310dcd58ed573aecdab99f8df1121d5',
-    },
-
-    {
-        'model': 'seresnext50',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': False,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/seresnext50_imagenet_1000_no_top.h5',
-        'name': 'seresnext50_imagenet_1000_no_top.h5',
-        'md5': 'b0f23d2e1cd406d67335fb92d85cc279',
-    },
-
-    {
-        'model': 'seresnext101',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': True,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/seresnext101_imagenet_1000.h5',
-        'name': 'seresnext101_imagenet_1000.h5',
-        'md5': 'be5b26b697a0f7f11efaa1bb6272fc84',
-    },
-
-    {
-        'model': 'seresnext101',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': False,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/seresnext101_imagenet_1000_no_top.h5',
-        'name': 'seresnext101_imagenet_1000_no_top.h5',
-        'md5': 'e48708cbe40071cc3356016c37f6c9c7',
-    },
-
-    {
-        'model': 'senet154',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': True,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/senet154_imagenet_1000.h5',
-        'name': 'senet154_imagenet_1000.h5',
-        'md5': 'c8eac0e1940ea4d8a2e0b2eb0cdf4e75',
-    },
-
-    {
-        'model': 'senet154',
-        'dataset': 'imagenet',
-        'num_classes': 1000,
-        'include_top': False,
-        'url': 'https://github.com/qubvel/classification_models/releases/download/0.0.1/senet154_imagenet_1000_no_top.h5',
-        'name': 'senet154_imagenet_1000_no_top.h5',
-        'md5': 'd854ff2cd7e6a87b05a8124cd283e0f2',
-    }
-]
-
-
 # ----------------------------------------------------------------------------------------------------------
-# Give the arguments of the SE Residual Models
+# Give the arguments of the SqueezeNet Residual Model Variants 
 # ----------------------------------------------------------------------------------------------------------
 
 MODELS_PARAMS = {
@@ -679,8 +520,10 @@ def SENet154(input_shape=None, input_tensor=None, weights=None, num_classes=1000
                  include_top=include_top, num_classes=num_classes, weights=weights, **kwargs)
 
 
+# ----------------------------------------------------------------------------------------------------------
+# Preprocess any given image 
+# ----------------------------------------------------------------------------------------------------------
 def preprocess_input(x):
-    # Process any given image
     x = image.img_to_array(x)
     x = np.expand_dims(x, axis=0)
     x = np.divide(x, 255.0)
@@ -690,7 +533,9 @@ def preprocess_input(x):
     return output
 
 
+# ----------------------------------------------------------------------------------------------------------
 # Set the attributes 
+# ----------------------------------------------------------------------------------------------------------
 setattr(SEResNet50, '__doc__', SENet.__doc__)
 setattr(SEResNet101, '__doc__', SENet.__doc__)
 setattr(SEResNet152, '__doc__', SENet.__doc__)
@@ -699,12 +544,12 @@ setattr(SEResNeXt101, '__doc__', SENet.__doc__)
 setattr(SENet154, '__doc__', SENet.__doc__)
 
 
-# Call the specific models 
 if __name__ == '__main__':
-
-    input_shape=(224,224,3)
+    # Call the specific model 
+    input_shape = (224,224,3)
     num_classes = 1000
 
+    # Please set "include_top=False" to get the notop weights. 
     model= SEResNet50(input_shape=None, input_tensor=None, weights='imagenet', 
                       num_classes=num_classes, include_top=True)
 
@@ -716,5 +561,6 @@ if __name__ == '__main__':
 
     print('Input image shape:', output.shape)
 
+    # Preduct the given image 
     preds = model.predict(output)
     print('Predicted:', decode_predictions(preds))
