@@ -6,7 +6,6 @@
 """
 There are the weights used im the SqueezeNet model variants including the scenatios of "inlcude_top=True"
 and "inlcude_top=Flase". I would like to thank qubvel for his generous contribution.
-
 """
 
 from keras.utils.data_utils import get_file
