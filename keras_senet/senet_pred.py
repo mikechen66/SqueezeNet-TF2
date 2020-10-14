@@ -8,6 +8,16 @@ Please remember that it is the TensorFlow realization with image_data_foramt = '
 the env of Keras is 'channels_first', please change it  according to the TensorFlow convention.  
 Grouped Convolution Layer is implemented as a Slice, Conv2D and Concatenate Split filters to groups. 
 
+If users want to get the notop weights, please use the following section of code. 
+
+# Call the specific model with designating "include_top=False" 
+if __name__ == '__main__':
+    input_shape = (224,224,3)
+    num_classes = 1000
+    model= SEResNet50(input_shape=None, input_tensor=None, weights='imagenet', 
+                      num_classes=num_classes, include_top=False)
+    model.summary()
+
 # Set up the GPU memory size to avoid the out-of-memory error if the GPU setting has a problem 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
