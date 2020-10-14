@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# imagenet_utils.py
 """
 Utilities for ImageNet data preprocessing & prediction decoding.
 """
