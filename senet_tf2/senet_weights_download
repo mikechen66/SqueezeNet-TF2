@@ -1,0 +1,6 @@
+squeezenet_weights_download
+
+Please download the weights if users have any difficulty to download them during 
+the runtime or intend to speed up the traning. 
+
+https://github.com/qubvel/classification_models/releases
