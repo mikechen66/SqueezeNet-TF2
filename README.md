@@ -11,7 +11,7 @@ be transmitted over a computer network.
 ## Modifications 
 
 Please remember that it is the TensorFlow realization with image_data_foramt = 'channels_last'. 
-If the env of Keras is 'channels_first', please change it according to the TensorFlow convention.  
+If the env of Keras is 'channels_first', please change it according to the TensorFlow convention.
 Make the necessary changes to adapt to TensorFlow 2.2, Keras 2.4.3 and cuDNN 8.0.1. 
 
 In addition, write the new lines of code to replace the deprecated code. The script has many 
